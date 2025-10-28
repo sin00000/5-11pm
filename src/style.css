@@ -1,0 +1,17 @@
+body {
+    user-select: none;
+}
+
+#c {
+    text-align: center;
+}
+
+#title {
+    font-size: 70px;
+    font-weight: 200;
+}
+
+#game {
+    text-align: center;
+    font-size: medium;
+}
