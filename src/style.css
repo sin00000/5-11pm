@@ -1,5 +1,6 @@
 body {
     user-select: none;
+    background-color: rgb(232, 232, 232);
 }
 
 #c {
@@ -7,11 +8,12 @@ body {
 }
 
 #title {
-    font-size: 70px;
+    font-size: 60px;
     font-weight: 200;
 }
 
 #game {
     text-align: center;
     font-size: medium;
+    font-size: larger;
 }
