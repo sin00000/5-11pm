@@ -1,9 +1,30 @@
 const t = document.getElementById('text');
 const c = document.createElement("div");
+const a = document.getElementById('choices');
 const b = document.createElement("div");
 document.getElementById('game').appendChild(b);
 document.getElementById('game').appendChild(c);
 
+b.after(c);
+b.style.position = "absolute";
+b.style.top = "30px";
+c.style.position = "absolute";
+c.style.alignItems = "center";
+c.style.top = "65%";
+Object.assign(t.style, {
+    position: "fixed",
+    top: "10%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "80%",
+    textAlign: "center",
+    fontSize: "20px",
+    lineHeight: "1.5",
+    color: "white",
+    background: "rgba(0, 0, 0, 0.4)",
+    padding: "10px",
+    borderRadius: "10px"
+});
 
 let l = 0;
 let d = [];
@@ -2251,21 +2272,21 @@ const npc = {
         m13: {
             s: "...뭐, 원리도 모르는 해체 방법이 악용되진 않겠죠. 워낙 방법이 다양하니 하나만 알려드릴게요. ",
             a: [
-                { t: "수박 폭탄", n: "m14" },
-                { t: "물병 폭탄", n: "m15" },
+                { t: "금속 폭탄", n: "m14" },
+                { t: "플라스틱 폭탄", n: "m15" },
                 { t: "시계 폭탄", n: "m16" }
             ]
         },
         m14: {
-            s: "최근 유행하는 사제 폭탄이죠. 먼저 초록색, 검은색, 흰색, 붉은색 줄을 순서대로 자르고 검은 버튼을 누르면 돼요. 안정성이 떨어져서 해체해도 자폭할 위험이 있긴 하지만... 뭐, 사제용이 다 그렇죠. ",
+            s: "최근 유행하는 사제 폭탄이죠. 파란 줄을 끊으면 돼요. 안정성이 떨어져서 해체해도 자폭할 위험이 있긴 하지만... 뭐, 사제용이 다 그렇죠. ",
             a: [{ t: "대화를 마친다", n: "end" }]
         },
         m15: {
-            s: "가장 간단하게 풀 수 있는 폭탄이죠. 먼저 푸른색 버튼을 누른 다음 하얀 선을 자르면 돼요. 아, 어디가서 제가 말했다고 하진 마세요. ",
+            s: "가장 간단하게 풀 수 있는 폭탄이죠. 먼저 붉은 선만 자르면 돼요. 아, 어디가서 제가 말했다고 하진 마세요. ",
             a: [{ t: "대화를 마친다", n: "end" }]
         },
         m16: {
-            s: "아, 폭탄의 고전이죠. 12시부터 시계 방향으로 버튼을 누른다음, 빨간선과 파란선을 자르면 됩니다. 그런데 이런 정보가 정말 필요하나요? ",
+            s: "아, 폭탄의 고전이죠. 빨간선과 파란선을 자르면 됩니다. 그런데 이런 정보가 정말 필요하나요? ",
             a: [{ t: "대화를 마친다", n: "end" }]
         },
     },
@@ -5306,12 +5327,44 @@ const obj = [
                             {
                                 n: "빨간 줄",
                                 d: "붉은 절연 테이프로 감긴 전선이다. 자를까?",
-                                f: () => eg('r')
+                                sub: [
+                                    { n: "자른다", f: () => eg("r") }
+                                ]
                             },
                             {
                                 n: "파란 줄",
                                 d: "차가운 파란색 전선이 살짝 흔들리고 있다. 자를까?",
-                                f: () => eg('b')
+                                sub: [
+                                    { n: "자른다", f: () => eg("b") }
+                                ]
+                            },
+                            {
+                                n: "노란 줄",
+                                d: "희미하게 빛나는 노란색 전선이다. 자를까?",
+                                sub: [
+                                    { n: "자른다", f: () => eg("y") }
+                                ]
+                            },
+                            {
+                                n: "초록 줄",
+                                d: "녹색 절연 피복이 벗겨진 곳이 있다. 자를까?",
+                                sub: [
+                                    { n: "자른다", f: () => eg("g") }
+                                ]
+                            },
+                            {
+                                n: "보라 줄",
+                                d: "보라색 전선이 묘하게 진동하고 있다. 자를까?",
+                                sub: [
+                                    { n: "자른다", f: () => eg("p") }
+                                ]
+                            },
+                            {
+                                n: "하얀 줄",
+                                d: "새하얀 전선이다. 아주 조용하다. 자를까?",
+                                sub: [
+                                    { n: "자른다", f: () => eg("w") }
+                                ]
                             }
                         ]
                     }
@@ -5319,6 +5372,7 @@ const obj = [
             }
         ]
     },
+
 
     { n: "칠판", d: "분필 가루가 가득하다. 지워진 글씨 흔적이 남아 있다." },
     {
@@ -5408,32 +5462,24 @@ const obj = [
 
 
 
-
-
-function tj() {
-    if (l >= 5) return "살고싶어...";
-    if (l >= 3) return "다시 시작인가요...";
-    return "이게 끝나기는 해?";
-}
-
 function st() {
     if (ts) return;
     ts = true;
-    let time = 60;
+    let time = 180;
     b.style.width = "100%";
     b.style.height = "10px";
-    b.style.background = "red";
+    b.style.background = "green";
 
     iv = setInterval(() => {
         time--;
-        b.style.width = `${(time / 60) * 100}%`;
+        b.style.width = `${(time / 180) * 100}%`;
         if (time <= 0) clearInterval(iv);
     }, 1000);
 
     tm = setTimeout(() => {
-        d.push("시간 초과");
+        d.push("이번 회차가 끝났습니다. ");
         eg();
-    }, 60000);
+    }, 180000);
 }
 
 function sc(opt) {
@@ -5458,7 +5504,9 @@ function mp(p) {
     img.src = p.face || '';
     img.alt = `${p.n}의 얼굴`;
     img.style.width = '100px';
-
+    img.style.borderRadius = "10px";
+    img.style.margin = "290px auto 0";
+    t.after(img);
     const face = document.getElementById('face');
     if (face) {
         face.innerHTML = '';
@@ -5503,8 +5551,6 @@ function showObjList() {
     })).concat([{ t: "뒤로", f: mm }]));
 }
 
-
-
 function showNext(name, step) {
     const char = npc[name];
     const next = char[step];
@@ -5530,9 +5576,6 @@ function showNext(name, step) {
         mm();
     }
 }
-
-
-
 
 function cs(x) {
     st();
@@ -5613,42 +5656,18 @@ function si() {
     c.appendChild(btn);
 }
 
-function eg(clr) {
-    go = true;
-    clearTimeout(tm);
-    clearInterval(iv);
-    ts = false;
-    c.innerHTML = "";
 
-    if (clr === "r") {
-        t.innerHTML = "빨간 줄이 끊어졌습니다.<br>전원 사망<br>";
-    }
-    else if (clr === "b") {
-        t.innerHTML = `파란 줄이 끊어졌습니다.<br> 당신만 사망.<br><br>죽은 사람 목록:<br>당신`;
-    }
-    else {
-        t.innerHTML = "폭발 발생<br><br>죽은 사람:<br>" + d.join("<br>");
-    }
-
-    sc([
-        { t: "회귀하기", f: rg },
-        { t: "포기하기", f: gu }
-    ]);
-
-    localStorage.setItem("deadList", JSON.stringify(d));
-
-}
 
 function gu() {
-    t.innerHTML = "당신은 긴 싸움에서 패배하였습니다. <br> <br>you lose...";
+    t.innerHTML = "당신은 긴 싸움에서 패배하였습니다. <br> <br> 당신은 인간이자, 살인자로 남았습니다. <br> 모두를 살릴 수 있는 방법은 역시 불가능한 걸까요? <br> 시간이 선형으로 흐르기 시작합니다. <br> 죽은 이들의 침묵과, 산 자들의 비명이 들립니다. <br> 당신은 다시, 눈을 감았습니다. ";
     c.innerHTML = "";
     setTimeout(() => { window.location.href = "index.html"; }, 3000);
 }
 
-let loc = "길거리"
+
 function mm() {
     st();
-    t.innerText = `회귀 횟수: ${l}\n \n현재 위치: ${loc} \n `
+    t.innerText = `회귀 횟수: ${l}\n \n당신은 승리하고 있습니다.\n `
     sc([
         { t: "소리치기", f: sh },
         { t: "탐색하기", f: () => sc(Object.keys(s).map(x => ({ t: x, f: () => cs(x) }))) },
@@ -5706,26 +5725,40 @@ function ce(n) {
 let evList = [];
 
 function clickItem(it) {
+    if (typeof it.f === "function") {
+        it.f();
+        return;
+    }
 
     if (it.sub && Array.isArray(it.sub)) {
         t.innerText = `${it.n} 안에는 다음이 있습니다.`;
-        sc(it.sub.map(sub => ({
-            t: sub.n,
-            f: () => clickItem(sub)
-        })).concat([{ t: "뒤로", f: mm }]));
+        sc(
+            it.sub
+                .map(sub => ({ t: sub.n, f: () => clickItem(sub) }))
+                .concat([{ t: "뒤로", f: mm }])
+        );
         return;
     }
+
     if (it.ev) {
         collectEv(it);
         return;
     }
+
     if (it.d) {
         t.innerText = `${it.n}: ${it.d}`;
     } else {
         t.innerText = `${it.n}을(를) 살펴봤지만 별다른 건 없습니다.`;
     }
+
     sc([{ t: "뒤로", f: mm }]);
 }
+const npcList = Object.values(s).flatMap(area =>
+    area["사람에게 다가가기"].map(p => ({
+        n: p.n,
+        face: p.face || "image/player.jpg"
+    }))
+);
 
 
 function collectEv(it) {
@@ -5740,17 +5773,86 @@ function collectEv(it) {
 
 function ir(n, o) {
     const oname = (typeof o === 'string') ? o : (o && o.n) ? o.n : String(o);
-    t.innerText = `${n}은(는) '${oname}'에 대해 당황한 표정을 짓습니다.`;
+    t.innerText = `${n}은(는) '${oname}'에 대해 아무런 반응이 없습니다.`;
     sc([{ t: "돌아가기", f: mm }]);
 }
 
 function rg() {
     l++;
+    localStorage.setItem("loopCount", l);
     d = [];
     go = false;
     ts = false;
+    d.push(`회귀 횟수: ${l}`);
     t.innerText = "다시 눈을 떴습니다.";
     mm();
 }
+function endGame(mode, clr) {
+    let dead = [];
+
+    switch (mode) {
+        case "run":
+            dead = npcList;
+            break;
+
+        case "wire":
+            if (clr === "b") {
+                const playerName = localStorage.getItem("playerName") || "당신";
+                dead = [{ n: playerName, face: "image/player.jpg" }];
+            } else {
+                dead = npcList;
+            }
+            break;
+
+        case "help":
+            dead = npcList.slice(2);
+            break;
+
+        case "bomb":
+            dead = npcList.slice(Math.floor(npcList.length / 2));
+            break;
+
+        case "timeout":
+        default:
+            dead = npcList;
+            break;
+    }
+
+
+    localStorage.setItem("deadList", JSON.stringify(dead));
+
+    // end.html로 이동
+    window.location.href = "end.html";
+}
+
+
+function eg(clr) {
+    clearTimeout(tm);
+    clearInterval(iv);
+    ts = false;
+    endGame("wire", clr);
+}
+
+
+function runAway() {
+    endGame("run");
+}
+
+
+function timeOut() {
+    endGame("timeout");
+}
+
+
+function shoutHelp() {
+    setTimeout(() => endGame("help"), 5000);
+}
+
+function shoutBomb() {
+    setTimeout(() => endGame("bomb"), 5000);
+}
+
+
 
 mm();
+

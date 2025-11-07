@@ -49,3 +49,20 @@ input {
     border-radius: 30%;
 
 }
+
+#choices {
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    align-items: center;
+}
+
+#last {
+    width: 100%;
+    height: 40px;
+    bottom: 1px;
+    position: absolute;
+    color: rgb(80, 80, 80);
+
+
+}
