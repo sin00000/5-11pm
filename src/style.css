@@ -71,3 +71,14 @@ input {
     font-size: larger;
     color: crimson;
 }
+
+#dddd {
+    color: azure;
+    background-color: black;
+    text-align: center;
+}
+
+#tc {
+    color: rgb(146, 241, 133);
+    font-size: large;
+}
