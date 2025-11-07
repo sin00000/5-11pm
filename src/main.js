@@ -5,6 +5,7 @@ const b = document.createElement("div");
 document.getElementById('game').appendChild(b);
 document.getElementById('game').appendChild(c);
 
+
 b.after(c);
 b.style.position = "absolute";
 b.style.top = "30px";
@@ -12,7 +13,7 @@ c.style.position = "absolute";
 c.style.alignItems = "center";
 c.style.top = "65%";
 Object.assign(t.style, {
-    position: "fixed",
+    position: "absolute",
     top: "10%",
     left: "50%",
     transform: "translateX(-50%)",
@@ -26,7 +27,7 @@ Object.assign(t.style, {
     borderRadius: "10px"
 });
 
-let l = 0;
+let l = parseInt(localStorage.getItem("loopCount"), 10) || 0;
 let d = [];
 let tm, iv;
 let ts = false;
@@ -206,7 +207,7 @@ const s = {
             { n: "이준수 (21)", face: "image/73.jpg" },
             { n: "오만수 (81)", face: "image/74.jpg" },
             { n: "박수현 (36)", face: "image/75.jpg" },
-            { n: "오민재 (18)", face: "image/76jpg" },
+            { n: "오민재 (18)", face: "image/76.jpg" },
             { n: "최민서 (29)", face: "image/77.jpg" }
         ],
         "탐색하기": [
@@ -5349,7 +5350,7 @@ const obj = [
                                 n: "초록 줄",
                                 d: "녹색 절연 피복이 벗겨진 곳이 있다. 자를까?",
                                 sub: [
-                                    { n: "자른다", f: () => eg("g") }
+                                    { n: "자른다", f: () => eg("re") }
                                 ]
                             },
                             {
@@ -5457,8 +5458,31 @@ const obj = [
     },
     { n: "레스토랑 좌석", d: "의자 위엔 식은 수프가 엎질러져 있다." },
     { n: "레스토랑 창문", d: "유리창에 손자국이 남아 있다." },
-    { n: "레스토랑 천장", d: "물 얼룩이 번지고 있다. 천장에서 물방울이 떨어진다." }
+    {
+        n: "레스토랑 천장", d: "물 얼룩이 번지고 있다. 천장에서 물방울이 떨어진다.",
+        sub: [
+            { n: "물 얼룩 자국", d: "커다란 물 얼룩이 번져 있다.", ev: true },
+            { n: "떨어지는 물방울", d: "천장에서 차가운 물방울이 규칙적으로 떨어진다.", ev: true }
+        ]
+    }
 ];
+
+const dialogMap = {
+    "송정호": {
+        "계약서 사본": { s: "송정호: 이... 이건 내가 정리한 게 아냐. 난 그저 지시받았을 뿐이라고!", end: true },
+        "보증금 명세서": { s: "송정호: 보증금 금액을 조작했어. 하지만 난 단순한 전달책이었어. 내 선에서 끝난 일이 아니야.", end: false },
+        "금속 장치": { s: "송정호: 폭탄... 그건 내가 설치한 게 아니야. 부동산 책상 아래에 있는 건 몰랐어. 누가 설치한 거지?", end: false }
+    },
+    "이나경": {
+        "메모된 영수증": { s: "이나경: '다 끝나면 연락해'... 내가 적었어. 그 사람을 막으려고 했지만 너무 늦었지.", end: true },
+        "정신과 약": { s: "이나경: 이건 내 약이 아니야. 누가 내 약통에 다른 약을 넣었어. 대체 무슨 꿍꿍이지?", end: false },
+        "찢어진 자국": { s: "이나경: 옷에 난 찢어진 자국? 어제 옷가게에서 그 사람과 몸싸움을 했어. 내가 그를 막았어야 했는데...", end: false }
+    },
+    "김명규": {
+        "학생 노트": { s: "김명규: '그날'이라고... 그래, 내가 그날 학원 강사였어. 모든 게 거기서부터 시작됐지.", end: true }
+    }
+};
+
 
 
 
@@ -5522,15 +5546,8 @@ function mp(p) {
         sc([{ t: "...", f: mm }]);
     }
 }
-
 function oj(p) {
-    const ojname = p.n.split(" ")[0];
-    const item = obj.find(x => (x.n || "").split(" ")[0] === ojname);
-
-    if (!item) {
-        t.innerText = `${p.n}: 아무것도 없는 듯합니다.`;
-        return;
-    }
+    const item = p;
 
     t.innerText = `${item.n}: ${item.d || item.s || "특이한 점은 없어 보입니다."}`;
 
@@ -5772,9 +5789,25 @@ function collectEv(it) {
 }
 
 function ir(n, o) {
-    const oname = (typeof o === 'string') ? o : (o && o.n) ? o.n : String(o);
-    t.innerText = `${n}은(는) '${oname}'에 대해 아무런 반응이 없습니다.`;
-    sc([{ t: "돌아가기", f: mm }]);
+    const oname = o && o.n ? o.n : String(o);
+    const charName = n.split(" ")[0];
+
+    const personMap = dialogMap[charName];
+
+    if (personMap && personMap[oname]) {
+        const dialog = personMap[oname];
+        t.innerText = dialog.s;
+
+        if (dialog.end) {
+            sc([{ t: "진실을 밝힌다", f: () => eg("truth") }]);
+            return;
+        }
+
+        sc([{ t: "다른 증거 제시하기", f: () => ce(n) }, { t: "돌아가기", f: mm }]);
+    } else {
+        t.innerText = `${n}은(는) '${oname}'에 대해 아무런 반응이 없습니다.`;
+        sc([{ t: "돌아가기", f: mm }]);
+    }
 }
 
 function rg() {
@@ -5787,7 +5820,9 @@ function rg() {
     t.innerText = "다시 눈을 떴습니다.";
     mm();
 }
-function endGame(mode, clr) {
+rg();
+
+function endGame(mode) {
     let dead = [];
 
     switch (mode) {
@@ -5795,13 +5830,21 @@ function endGame(mode, clr) {
             dead = npcList;
             break;
 
+        case "re":
+            window.location.href = "re.html";
+            return;
+
+        case "b":
+            const playerName = localStorage.getItem("playerName") || "당신";
+            dead = [{ n: playerName, face: "image/player.jpg" }];
+            break;
+
+        case "r":
+        case "y":
+        case "p":
+        case "g":
         case "wire":
-            if (clr === "b") {
-                const playerName = localStorage.getItem("playerName") || "당신";
-                dead = [{ n: playerName, face: "image/player.jpg" }];
-            } else {
-                dead = npcList;
-            }
+            dead = npcList;
             break;
 
         case "help":
@@ -5821,18 +5864,24 @@ function endGame(mode, clr) {
 
     localStorage.setItem("deadList", JSON.stringify(dead));
 
-    // end.html로 이동
     window.location.href = "end.html";
 }
 
-
-function eg(clr) {
+function eg(mode) {
     clearTimeout(tm);
     clearInterval(iv);
     ts = false;
-    endGame("wire", clr);
+    endGame(mode);
 }
 
+document.getElementById("replay").onclick = () => {
+
+    const cur = parseInt(localStorage.getItem("loopCount"), 10) || 0;
+    localStorage.setItem("loopCount", cur + 1);
+
+    localStorage.removeItem("deadList");
+    location.href = "1.html";
+};
 
 function runAway() {
     endGame("run");
