@@ -5965,22 +5965,23 @@ function collectEv(it) {
 
 function ir(n, o) {
     const oname = o && o.n ? o.n : String(o);
-    const charName = n.split(" ")[0];
+
+    const charName = n.split(" ").slice(0, 3).join(" ");
 
     const personMap = dialogMap[charName];
+    const dialog = personMap && personMap[oname];
 
-    if (personMap && personMap[oname]) {
-        const dialog = personMap[oname];
-        t.innerText = dialog.s;
+    if (dialog) {
+        t.innerText = `${charName}: ${dialog.s}`;
 
         if (dialog.end) {
-            sc([{ t: "진실을 밝힌다", f: () => eg("truth") }]);
+            sc([{ t: "뭔가 잘못된 거 같다...", f: () => eg("truth") }]);
             return;
         }
 
         sc([{ t: "다른 증거 제시하기", f: () => ce(n) }, { t: "돌아가기", f: mm }]);
     } else {
-        t.innerText = `${n}은(는) '${oname}'에 대해 아무런 반응이 없습니다.`;
+        t.innerText = `${charName}은(는) '${oname}'에 대해 아무런 반응이 없습니다.`;
         sc([{ t: "돌아가기", f: mm }]);
     }
 }
